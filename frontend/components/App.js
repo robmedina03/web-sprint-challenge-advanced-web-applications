@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NavLink, Routes, Route, useNavigate } from 'react-router-dom'
 import Articles from './Articles'
 import LoginForm from './LoginForm'
@@ -15,13 +15,31 @@ export default function App() {
   const [articles, setArticles] = useState([])
   const [currentArticleId, setCurrentArticleId] = useState()
   const [spinnerOn, setSpinnerOn] = useState(false)
+     
+      useEffect(() =>{
+        checkLoggedIn()
+      },[])
+
+      const checkLoggedIn = () => {
+
+        const token = localStorage.getItem('token')
+        if(!token){
+          logout()
+        }
+       
+      }
+
+
 
   // ✨ Research `useNavigate` in React Router v.6
   const navigate = useNavigate()
-  const redirectToLogin = () => { /* ✨ implement */ }
-  const redirectToArticles = () => { /* ✨ implement */ }
+  const redirectToLogin = () => { navigate('/') }
+  const redirectToArticles = () => { navigate('/articles') }
 
   const logout = () => {
+    localStorage.removeItem('token')
+    setMessage('Goodbye!')
+
     // ✨ implement
     // If a token is in local storage it should be removed,
     // and a message saying "Goodbye!" should be set in its proper state.
@@ -29,7 +47,29 @@ export default function App() {
     // using the helper above.
   }
 
-  const login = ({ username, password }) => {
+  const login = async ({ username, password }) => {
+        
+        setSpinnerOn(true)
+        try{
+
+          const response = await fetch(loginUrl, {
+            method:'POST',
+            headers:{'Content-type': 'application/json'},
+            body: JSON.stringify({username: username.trim(), password: password.trim()})
+          })
+          if(!response.ok){
+            throw new Error('Invalid username or password')
+          }
+          const data = await response.json()
+          localStorage.setItem('token', data.token)
+          username= localStorage.getItem('username')
+          setMessage(`Here are your articles, ${username}!`)
+          redirectToArticles()
+        }catch(error){
+          setMessage(error.message)
+        }
+        setSpinnerOn(false)
+
     // ✨ implement
     // We should flush the message state, turn on the spinner
     // and launch a request to the proper endpoint.
@@ -38,38 +78,107 @@ export default function App() {
     // to the Articles screen. Don't forget to turn off the spinner!
   }
 
-  const getArticles = () => {
-    // ✨ implement
-    // We should flush the message state, turn on the spinner
-    // and launch an authenticated request to the proper endpoint.
-    // On success, we should set the articles in their proper state and
-    // put the server success message in its proper state.
-    // If something goes wrong, check the status of the response:
-    // if it's a 401 the token might have gone bad, and we should redirect to login.
-    // Don't forget to turn off the spinner!
+  const getArticles = async() => {
+
+      setSpinnerOn(true)
+
+      try{
+        const token = localStorage.getItem('token')
+        const response = await fetch(articlesUrl,{
+          headers:{Authorization:token}})
+          if(!response.ok){
+            if(response.status === 401){
+              throw new Error('Token Expired, please log in again')
+            }
+            throw new Error('Failed to fetch articles')
+          }
+          const data = await response.json()
+          setArticles(data.articles)
+          setMessage(`Here are your articles, ${localStorage.getItem('username')}!`)
+        
+      }catch(error){
+        setMessage(error.message)
+        if(error.message === 'Token Expired please log in again'){
+          redirectToLogin()
+        }
+      }
+      setSpinnerOn(false)
+   
   }
 
-  const postArticle = article => {
-    // ✨ implement
-    // The flow is very similar to the `getArticles` function.
-    // You'll know what to do! Use log statements or breakpoints
-    // to inspect the response from the server.
+  const postArticle = async (article) => {
+      setSpinnerOn(true)
+      try{
+        const token= localStorage.getItem('token')
+        
+        const response = await fetch(articlesUrl, {
+          method: 'POST',
+          headers:{Authorization: token, 'Content-type': 'application/json'},
+          body: JSON.stringify(article)
+        })
+        if(!response.ok){
+          throw new Error('Failed to create article')
+        }
+      
+        setMessage(`Well done, ${localStorage.getItem('username')}. Great article!`)
+        await getArticles()
+      }catch(error){
+        setMessage(error.message)
+      }
+      setSpinnerOn(false)
+    }
+
+    
+
+  const updateArticle = async ({ article_id, article }) => {
+    
+      setSpinnerOn(true)
+
+      try{
+        const token= localStorage.getItem('token')
+        const response = await fetch(`${articlesUrl}/${article_id}`, {
+          method: 'PUT',
+          headers: {Authorization: token, 'Content-type': 'application.json'},
+          body: JSON.stringify(article)
+        })
+        if(!response.ok){
+          throw new Error('Failed to update article')
+        }
+        setMessage('Aticle updated successfully')
+        await getArticles()
+      }catch(error){
+        setMessage(error.message)
+      }
+      setSpinnerOn(false)
+
+
   }
 
-  const updateArticle = ({ article_id, article }) => {
-    // ✨ implement
-    // You got this!
-  }
-
-  const deleteArticle = article_id => {
-    // ✨ implement
+  const deleteArticle = async article_id => {
+      setSpinnerOn(true)
+      try{
+        const token = localStorage.getItem('token')
+        const response = await fetch(`${articlesUrl}/${article_id}`,{
+          method: 'DELETE',
+          headers:{Authorization: token}
+        })
+        if(!response.ok){
+          throw new Error('Failed to delete article')
+        }
+        setMessage(`Article ${article_id} was deleted, ${localStorage.getItem('username')}!`)
+        await getArticles()
+      }catch(error){
+        setMessage(error.message)
+      }
+      setSpinnerOn(false)
+    
   }
 
   return (
     // ✨ fix the JSX: `Spinner`, `Message`, `LoginForm`, `ArticleForm` and `Articles` expect props ❗
     <>
-      <Spinner />
-      <Message />
+      <Spinner on={spinnerOn} />
+     {message && <Message message={message} />}
       <button id="logout" onClick={logout}>Logout from app</button>
       <div id="wrapper" style={{ opacity: spinnerOn ? "0.25" : "1" }}> {/* <-- do not change this line */}
         <h1>Advanced Web Applications</h1>
@@ -78,11 +187,11 @@ export default function App() {
           <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
         </nav>
         <Routes>
-          <Route path="/" element={<LoginForm />} />
+          <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
-              <Articles />
+              <ArticleForm postArticle={postArticle} updateArticle={updateArticle} setCurrentArticleId={setCurrentArticleId} currentArticleId={currentArticleId} Articles={Articles} />
+              <Articles  CurrentArticleId={currentArticleId} articles={articles} deleteArticle={deleteArticle} setCurrentArticleId={setCurrentArticleId} getArticles={getArticles} />
             </>
           } />
         </Routes>

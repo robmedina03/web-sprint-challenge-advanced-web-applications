@@ -1,43 +1,61 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import PT from 'prop-types'
 
-export default function Articles(props) {
-  // ✨ where are my props? Destructure them here
 
-  // ✨ implement conditional logic: if no token exists
-  // we should render a Navigate to login screen (React Router v.6)
+export default function Articles({getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId}) {
+  const [editingArticle, seteditingArticle] = useState(null)
 
+  
+ 
   useEffect(() => {
-    // ✨ grab the articles here, on first render only
-  })
+   getArticles()
+  }, [])
+
+  if(!localStorage.getItem('token')){
+    return <Navigate to= "/" />
+  }
+  
+  const handleEditClick = (article) => {
+    
+    
+    if(currentArticleId=== article.article_id){
+     
+      setCurrentArticleId(null)
+    }else {  
+    setCurrentArticleId(article.article_id)
+  }
+};
 
   return (
     // ✨ fix the JSX: replace `Function.prototype` with actual functions
     // and use the articles prop to generate articles
+
+    
     <div className="articles">
-      <h2>Articles</h2>
-      {
-        ![].length
-          ? 'No articles yet'
-          : [].map(art => {
-            return (
-              <div className="article" key={art.article_id}>
+    <h2>Articles</h2>
+    
+    {
+      articles.length === 0
+        ? ('No articles yet')
+        : (articles.map((art) => (
+          
+            <div className="article" key={art.article_id}>
+              <div>
+                <h3>{art.title}</h3>
+                <p>{art.text}</p>
+                <p>Topic: {art.topic}</p>
+              </div>
                 <div>
-                  <h3>{art.title}</h3>
-                  <p>{art.text}</p>
-                  <p>Topic: {art.topic}</p>
-                </div>
-                <div>
-                  <button disabled={true} onClick={Function.prototype}>Edit</button>
-                  <button disabled={true} onClick={Function.prototype}>Delete</button>
+                  <button disabled={art.article_id === currentArticleId}  onClick={() => handleEditClick(art)} >{art.article_id === currentArticleId ? 'Cancel Edit' : 'Edit'}</button>
+                  <button disabled={art.article_id === currentArticleId} onClick={() => deleteArticle(art.article_id)}>Delete</button>
                 </div>
               </div>
-            )
-          })
-      }
+            ))
+          )}
+        
     </div>
-  )
+  );
 }
 
 // 🔥 No touchy: Articles expects the following props exactly:
