@@ -28,6 +28,8 @@ export default function App() {
         }
        
       }
+      
+      const amILoggedIn = !localStorage.getItem('token')
 
 
 
@@ -184,7 +186,7 @@ export default function App() {
         <h1>Advanced Web Applications</h1>
         <nav>
           <NavLink id="loginScreen" to="/">Login</NavLink>
-          <NavLink id="articlesScreen" to="/articles">Articles</NavLink>
+         {amILoggedIn ? (<NavLink id="articlesScreen" to="/">Articles</NavLink>) : (<NavLink id="articlesScreen" to="/articles">Articles</NavLink>)}
         </nav>
         <Routes>
           <Route path="/" element={<LoginForm login={login} />} />

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect} from 'react'
 import { Navigate } from 'react-router-dom'
 import PT from 'prop-types'
 
 
-export default function Articles({getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId}) {
-  const [editingArticle, seteditingArticle] = useState(null)
+
+export default function Articles({getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId,}) {
+
 
   
  
@@ -19,12 +20,8 @@ export default function Articles({getArticles, articles,setCurrentArticleId,dele
   const handleEditClick = (article) => {
     
     
-    if(currentArticleId=== article.article_id){
-     
-      setCurrentArticleId(null)
-    }else {  
-    setCurrentArticleId(article.article_id)
-  }
+    setCurrentArticleId(currentArticleId === article.article_id ? null : article.article_id)
+   
 };
 
   return (
@@ -53,6 +50,7 @@ export default function Articles({getArticles, articles,setCurrentArticleId,dele
               </div>
             ))
           )}
+         
         
     </div>
   );
