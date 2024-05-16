@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PT from 'prop-types'
 
 const initialFormValues = { title: '', text: '', topic: '' } 
-export default function ArticleForm({postArticle, updateArticle, setCurrentArticleId, currentArticleId, currentArticle}) {
+export default function ArticleForm({postArticle, updateArticle, setCurrentArticleId, currentArticleId, articles }) {
   const [values, setValues] = useState(initialFormValues)
   
 
@@ -11,22 +11,26 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
 
   useEffect(() => {
     if(currentArticleId){
-     
-    
+
+      const foundArticle = articles.find(article => article.article_id === currentArticleId)
+      if(foundArticle){
+      
+
       setValues({
-        
-        title: currentArticle.title,
-        text: currentArticle.text,
-        topic: currentArticle.topic
+        article_id:foundArticle.article_id,
+        title: foundArticle.title,
+        text: foundArticle.text,
+        topic: foundArticle.topic
       
       })
+    }
      
     }else{
       setValues(initialFormValues)
       
     }
 
-  }, [currentArticle])
+  }, [currentArticleId])
 
   const onChange = evt => {
     const { id, value } = evt.target
@@ -37,7 +41,8 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
     evt.preventDefault()
 
     if(currentArticleId){
-      updateArticle({article_id: currentArticleId.article_id, article: values})
+      updateArticle({article_id: values.article_id, article: values})
+      console.log(values)
     }else{
       postArticle(values)
     }

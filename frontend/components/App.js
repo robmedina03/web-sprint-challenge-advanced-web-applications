@@ -66,7 +66,10 @@ export default function App() {
           localStorage.setItem('token', data.token)
           username= localStorage.getItem('username')
           setMessage(`Here are your articles, ${username}!`)
-          redirectToArticles()
+          setTimeout(() =>{
+            redirectToArticles()
+          },800)
+         
         }catch(error){
           setMessage(error.message)
         }
@@ -123,7 +126,10 @@ export default function App() {
         }
       
         setMessage(`Well done, ${localStorage.getItem('username')}. Great article!`)
-        await getArticles()
+        setTimeout(()=> {
+          getArticles()
+        }, 4000)
+        
       }catch(error){
         setMessage(error.message)
       }
@@ -140,14 +146,22 @@ export default function App() {
         const token= localStorage.getItem('token')
         const response = await fetch(`${articlesUrl}/${article_id}`, {
           method: 'PUT',
-          headers: {Authorization: token, 'Content-type': 'application.json'},
+          headers: {Authorization: token, 'Content-Type': 'application/json'},
+         
           body: JSON.stringify(article)
+         
         })
         if(!response.ok){
           throw new Error('Failed to update article')
         }
-        setMessage('Aticle updated successfully')
-        await getArticles()
+         await response.json()
+        const username = localStorage.getItem('username')
+        setMessage(`Nice update, ${username}!`)
+        setTimeout(() =>{
+          getArticles()
+        }, 4000)
+        
+      
       }catch(error){
         setMessage(error.message)
       }
@@ -167,8 +181,11 @@ export default function App() {
         if(!response.ok){
           throw new Error('Failed to delete article')
         }
+       
         setMessage(`Article ${article_id} was deleted, ${localStorage.getItem('username')}!`)
-        await getArticles()
+        setTimeout(() => {
+       
+         getArticles(); }, 4000 )
       }catch(error){
         setMessage(error.message)
       }
@@ -192,7 +209,7 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm postArticle={postArticle} updateArticle={updateArticle} setCurrentArticleId={setCurrentArticleId} currentArticleId={currentArticleId} Articles={Articles} />
+              <ArticleForm    updateArticle={updateArticle}   postArticle={postArticle}  setCurrentArticleId={setCurrentArticleId} currentArticleId={currentArticleId} articles={articles} />
               <Articles  CurrentArticleId={currentArticleId} articles={articles} deleteArticle={deleteArticle} setCurrentArticleId={setCurrentArticleId} getArticles={getArticles} />
             </>
           } />
