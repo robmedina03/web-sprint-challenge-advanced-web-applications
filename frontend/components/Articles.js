@@ -4,9 +4,9 @@ import PT from 'prop-types'
 
 
 
-export default function Articles({getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId,}) {
+export default function Articles(props) {
 
-
+const {getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId,} = props
   
  
   useEffect(() => {

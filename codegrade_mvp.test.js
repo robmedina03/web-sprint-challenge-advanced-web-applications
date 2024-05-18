@@ -7,7 +7,9 @@ import { st } from './backend/helpers'
 import App from './frontend/components/App'
 
 jest.setTimeout(750) // default 5000 too long for Codegrade
-const waitForOptions = { timeout: 150 }
+const waitForOptions = { timeout: 500
+  
+ }
 const queryOptions = { exact: false }
 
 const renderApp = ui => {

@@ -7,12 +7,13 @@ import PT from 'prop-types'
 
 const initialFormValues = {
   username: '',
-  password: '',
+  password: ''
 }
-export default function LoginForm({ login  }) {
+export default function LoginForm(props ) {
   
   const [values, setValues] = useState(initialFormValues)
-
+ 
+  const {login} = props
 
   
   
@@ -22,14 +23,10 @@ export default function LoginForm({ login  }) {
     setValues({ ...values, [id]: value })
   }
 
-  const onSubmit = async evt => {
+  const onSubmit =  evt => {
     evt.preventDefault()
-    try{
-    await login({ username: values.username, password: values.password})
+    login(values)
    
-  }catch(error){
-    console.error('Login failed:', error.message)
-  }
 }
 
   const isDisabled = () => {

@@ -2,8 +2,13 @@ import React, { useEffect, useState } from 'react'
 import PT from 'prop-types'
 
 const initialFormValues = { title: '', text: '', topic: '' } 
-export default function ArticleForm({postArticle, updateArticle, setCurrentArticleId, currentArticleId, articles }) {
+export default function ArticleForm(props) {
   const [values, setValues] = useState(initialFormValues)
+  const [isSubmitedDisabled, setIsSubmitDisabled] = useState(true)
+
+  const {currentArticleId,articles,updateArticle,setCurrentArticleId,postArticle} = props
+  
+  
   
 
   
@@ -32,9 +37,15 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
 
   }, [currentArticleId])
 
+  useEffect(() => {
+    setIsSubmitDisabled(true)
+  },[])
+
   const onChange = evt => {
     const { id, value } = evt.target
     setValues({ ...values, [id]: value })
+    const isDisabled = !values.title || !values.text || !values.topic
+    setIsSubmitDisabled(isDisabled)
   }
 
   const onSubmit = evt => {
@@ -42,19 +53,19 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
 
     if(currentArticleId){
       updateArticle({article_id: values.article_id, article: values})
-      console.log(values)
+      
     }else{
       postArticle(values)
     }
     setCurrentArticleId(null)
+
+    setValues(initialFormValues)
+
+    setIsSubmitDisabled(true)
     
   } 
 
-  const isDisabled = () => {
 
-    return !values.title || !values.text || !values.topic
-   
-  }
 
   return (
     // ✨ fix the JSX: make the heading display either "Edit" or "Create"
@@ -82,7 +93,7 @@ export default function ArticleForm({postArticle, updateArticle, setCurrentArtic
         <option value="Node">Node</option>
       </select>
       <div className="button-group">
-        <button disabled={isDisabled()} id="submitArticle"> {currentArticleId ? 'Submit': 'Create'}</button>
+        <button disabled={isSubmitedDisabled} id="submitArticle"> {currentArticleId ? 'Submit': 'Submit'}</button>
        {currentArticleId && <button onClick={ () => setCurrentArticleId(null)}>Cancel edit</button>}
       </div>
     </form>
