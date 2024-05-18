@@ -18,8 +18,7 @@ export default function App() {
      
       
       
-      const amILoggedIn = localStorage.getItem('token')
-
+  const amILoggedIn = localStorage.getItem('token')
 
 
  
@@ -30,8 +29,6 @@ export default function App() {
   const logout = () => {
     localStorage.removeItem('token')
     setMessage('Goodbye!')
-    
-      
       navigate('/')
   
 
@@ -67,7 +64,7 @@ export default function App() {
 
           })
           .catch(error => {
-            setMessage(error.message)
+            setMessage('Invalid credentials', error)
 
           })
           .finally(() => {
@@ -88,6 +85,7 @@ export default function App() {
             if(!response.ok){
               if(response.status === 401){
                 throw new Error('Token Expired, please log in again')
+              
               }
               throw new Error('Failed to fetch articles')
             }
@@ -96,15 +94,17 @@ export default function App() {
           .then(data => {
             setArticles(data.articles)
             setMessage(`Here are your articles, ${username}!`)
-            setSpinnerOn(false)
+            
           })
           .catch(error => {
             setMessage(error.message)
-            setSpinnerOn(false)
-            if(error.message === 'Token Expired please log in again'){
-              redirectToLogin()
+            if(error.message === 'Token Expired, please log in again'){
+                redirectToLogin()
             }
-
+       
+          })
+          .finally(() =>{
+            setSpinnerOn(false)
           })
       }
 
@@ -207,6 +207,12 @@ export default function App() {
 
         })
       }
+
+      useEffect(() => {
+        if(localStorage.getItem('token')){
+          getArticles()
+        }
+      }, [])
       
     
   
@@ -221,7 +227,7 @@ export default function App() {
         <h1>Advanced Web Applications</h1>
         <nav>
           <NavLink id="loginScreen" to="/">Login</NavLink>
-         {amILoggedIn ? (<NavLink id="articlesScreen" to="/">Articles</NavLink>) : (<NavLink id="articlesScreen" to="/articles">Articles</NavLink>)}
+         {amILoggedIn ? (<NavLink id="articlesScreen" to="/articles">Articles</NavLink>) : (<NavLink id="articlesScreen" to="/">Articles</NavLink>)}
         </nav>
         <Routes>
           <Route path="/" element={<LoginForm login= {login} />} />
