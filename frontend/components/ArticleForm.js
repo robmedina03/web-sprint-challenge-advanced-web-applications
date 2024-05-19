@@ -22,6 +22,7 @@ export default function ArticleForm(props) {
       
 
       setValues({
+        
         article_id:foundArticle.article_id,
         title: foundArticle.title,
         text: foundArticle.text,
@@ -35,7 +36,7 @@ export default function ArticleForm(props) {
       
     }
 
-  }, [currentArticleId])
+  }, [currentArticleId,articles])
 
   useEffect(() => {
     setIsSubmitDisabled(true)

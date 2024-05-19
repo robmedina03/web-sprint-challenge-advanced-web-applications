@@ -18,7 +18,7 @@ export default function App() {
      
       
       
-  const amILoggedIn = localStorage.getItem('token')
+    
 
 
  
@@ -28,6 +28,7 @@ export default function App() {
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('username')
     setMessage('Goodbye!')
       navigate('/')
   
@@ -58,13 +59,13 @@ export default function App() {
           })
           .then(data => {
             localStorage.setItem('token', data.token)
-            username= localStorage.getItem('username')
-          setMessage(`Here are your articles, ${username}!`)
+            localStorage.setItem('username', username.trim())
+          setMessage(`Here are your articles, ${username.trim()}!`)
            redirectToArticles()
 
           })
           .catch(error => {
-            setMessage('Invalid credentials', error)
+            setMessage(error.message)
 
           })
           .finally(() => {
@@ -94,6 +95,7 @@ export default function App() {
           .then(data => {
             setArticles(data.articles)
             setMessage(`Here are your articles, ${username}!`)
+          
             
           })
           .catch(error => {
@@ -227,14 +229,14 @@ export default function App() {
         <h1>Advanced Web Applications</h1>
         <nav>
           <NavLink id="loginScreen" to="/">Login</NavLink>
-         {amILoggedIn ? (<NavLink id="articlesScreen" to="/articles">Articles</NavLink>) : (<NavLink id="articlesScreen" to="/">Articles</NavLink>)}
+         {localStorage.getItem('token') ? (<NavLink id="articlesScreen" to="/articles">Articles</NavLink>) : (<NavLink id="articlesScreen" to="/articles">Articles</NavLink>)}
         </nav>
         <Routes>
           <Route path="/" element={<LoginForm login= {login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm   updateArticle={updateArticle}   postArticle={postArticle}  setCurrentArticleId={setCurrentArticleId} currentArticleId={currentArticleId} articles={articles} />
-              <Articles  CurrentArticleId={currentArticleId} articles={articles} deleteArticle={deleteArticle} setCurrentArticleId={setCurrentArticleId} getArticles={getArticles} />
+              <ArticleForm   updateArticle={updateArticle}   postArticle={postArticle}  setCurrentArticleId={setCurrentArticleId} currentArticleId={currentArticleId}  />
+              <Articles  currentArticleId={currentArticleId} articles={articles} deleteArticle={deleteArticle} setCurrentArticleId={setCurrentArticleId} getArticles={getArticles} />
             </>
           } />
         </Routes>

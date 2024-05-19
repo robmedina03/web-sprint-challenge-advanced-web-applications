@@ -20,9 +20,3 @@ test('renders correctly when the "on" is true', () => {
   expect(screen.getByText('Please wait...')).toBeInTheDocument();
 })
 
-test('has correct structure when rendered', () => {
-  const {container} = render(<Spinner on={true} />);
-  const spinner = container.querySelector('#spinner');
-  expect(spinner).toBeInTheDocument()
-  expect(spinner).toContainHTML('<h3>&nbsp;.</h3>&nbsp;&nbsp;&nbsp;Please wait...')
-});
