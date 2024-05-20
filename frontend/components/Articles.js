@@ -1,4 +1,4 @@
-import React, { useEffect} from 'react'
+import React, { useEffect,useState} from 'react'
 import { Navigate } from 'react-router-dom'
 import PT from 'prop-types'
 
@@ -7,6 +7,7 @@ import PT from 'prop-types'
 export default function Articles(props) {
 
 const {getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId,} = props
+const [isEditing, setIsEditing] = useState(false)
   
  
   useEffect(() => {
@@ -21,8 +22,17 @@ const {getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId,
     
     
     setCurrentArticleId(currentArticleId === article.article_id ? null : article.article_id)
+   if(!isEditing){
+    setIsEditing(true)
+   }
    
 };
+
+const handleDeleteClick = (article_id) => {
+  if(!isEditing){
+    deleteArticle(article_id)
+  }
+}
 
   return (
     // ✨ fix the JSX: replace `Function.prototype` with actual functions
@@ -44,8 +54,8 @@ const {getArticles, articles,setCurrentArticleId,deleteArticle,currentArticleId,
                 <p>Topic: {art.topic}</p>
               </div>
                 <div>
-                  <button disabled={art.article_id === currentArticleId}  onClick={() => handleEditClick(art)} >{art.article_id === currentArticleId ? 'Cancel Edit' : 'Edit'}</button>
-                  <button disabled={art.article_id === currentArticleId} onClick={() => deleteArticle(art.article_id)}>Delete</button>
+                  <button disabled={isEditing}  onClick={() => handleEditClick(art)} >{art.article_id === currentArticleId ? 'Edit' : 'Edit'}</button>
+                  <button disabled={isEditing} onClick={() => handleDeleteClick(art.article_id)}>Delete</button>
                 </div>
               </div>
             ))

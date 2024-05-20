@@ -23,8 +23,8 @@ export default function App() {
 
  
   const navigate = useNavigate()
-  const redirectToLogin = () => { navigate('/') }
-  const redirectToArticles = () => { navigate('/articles') }
+  const redirectToLogin = () =>  navigate('/') 
+  const redirectToArticles = () =>  navigate('/articles');
 
   const logout = () => {
     localStorage.removeItem('token')
@@ -41,16 +41,13 @@ export default function App() {
   }
 
   const login =  ({ username, password }) => {
-        
-        setSpinnerOn(true)
-        
-
-        fetch(loginUrl, {
+     setSpinnerOn(true)
+     fetch(loginUrl, {
             method:'POST',
-            headers:{'Content-type': 'application/json'},
+            headers:{'Content-Type': 'application/json'},
             body: JSON.stringify({username: username.trim(), password: password.trim()})
           })
-          .then(response => {
+          .then((response) => {
             if(!response.ok){
               throw new Error('Invalid username or password')
             }
@@ -64,25 +61,20 @@ export default function App() {
            redirectToArticles()
 
           })
-          .catch(error => {
-            setMessage(error.message)
+          .catch((error) => 
+            setMessage(error.message))
+            .finally(() => 
+              setSpinnerOn(false))
 
-          })
-          .finally(() => {
-            setSpinnerOn(false)
-          })
+          
   }
 
   const getArticles = () => {
-
-      setSpinnerOn(true)
-
-      
-        const token = localStorage.getItem('token')
-        const username = localStorage.getItem('username')
-               fetch(articlesUrl,{
-          headers:{Authorization:token}})
-          .then(response => {
+    setSpinnerOn(true)
+    const token = localStorage.getItem('token')
+    const username = localStorage.getItem('username')
+    fetch(articlesUrl,{ headers:{Authorization:token}})
+          .then((response) => {
             if(!response.ok){
               if(response.status === 401){
                 throw new Error('Token Expired, please log in again')
@@ -120,10 +112,10 @@ export default function App() {
         
         fetch(articlesUrl, {
           method: 'POST',
-          headers:{Authorization: token, 'Content-type': 'application/json'},
+          headers:{Authorization: token, 'Content-Type': 'application/json'},
           body: JSON.stringify(article)
         })
-        .then(response =>{
+        .then((response) =>{
           if(!response.ok){
             throw new Error('Failed to create article')
           }
@@ -133,13 +125,10 @@ export default function App() {
           setMessage(`Well done, ${localStorage.getItem('username')}. Great article!`)
             getArticles()
         })
-        .catch(error => {
-          setMessage(error.message)
-
-        })
-        .finally(() =>{
-          setSpinnerOn(false)
-        })
+        .catch(error => 
+          setMessage(error.message))
+          .finally(() =>
+            setSpinnerOn(false))
       }
 
 
@@ -156,7 +145,7 @@ export default function App() {
           body: JSON.stringify(article)
          
         })
-        .then(response => {
+        .then((response) => {
           if(!response.ok){
             throw new Error('Failed to update article')
           }
@@ -170,17 +159,13 @@ export default function App() {
 
         })
 
-        .catch(error => {
-          setMessage(error.message)
-
-        })
-        .finally(() => {
-          setSpinnerOn(false)
-
-        })
+        .catch(error => 
+          setMessage(error.message))
+          .finally(() => 
+            setSpinnerOn(false))
   }
 
-  const deleteArticle =  article_id => {
+  const deleteArticle =  (article_id) => {
       setSpinnerOn(true)
     
         const token = localStorage.getItem('token')
@@ -200,14 +185,11 @@ export default function App() {
          getArticles()
 
         })
-        .catch(error => {
-          setMessage(error.message)
-
-        })
-        .finally(() => {
-          setSpinnerOn(false)
-
-        })
+        .catch(error => 
+          setMessage(error.message))
+          .finally(() => 
+            setSpinnerOn(false))
+      
       }
 
       useEffect(() => {
@@ -235,7 +217,7 @@ export default function App() {
           <Route path="/" element={<LoginForm login= {login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm   updateArticle={updateArticle}   postArticle={postArticle}  setCurrentArticleId={setCurrentArticleId} currentArticleId={currentArticleId}  />
+              <ArticleForm   updateArticle={updateArticle}   postArticle={postArticle}  setCurrentArticleId={setCurrentArticleId} currentArticleId={currentArticleId} articles={articles}  />
               <Articles  currentArticleId={currentArticleId} articles={articles} deleteArticle={deleteArticle} setCurrentArticleId={setCurrentArticleId} getArticles={getArticles} />
             </>
           } />

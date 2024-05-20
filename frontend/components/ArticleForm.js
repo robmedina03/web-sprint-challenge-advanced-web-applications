@@ -39,8 +39,9 @@ export default function ArticleForm(props) {
   }, [currentArticleId,articles])
 
   useEffect(() => {
-    setIsSubmitDisabled(true)
-  },[])
+    const isDisabled = !values.title || !values.text || !values.topic
+    setIsSubmitDisabled(isDisabled)
+  },[values])
 
   const onChange = evt => {
     const { id, value } = evt.target
@@ -62,7 +63,7 @@ export default function ArticleForm(props) {
 
     setValues(initialFormValues)
 
-    setIsSubmitDisabled(true)
+    
     
   } 
 
